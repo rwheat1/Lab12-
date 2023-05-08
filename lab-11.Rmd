@@ -81,5 +81,32 @@ observed_weight <- ncbirths_white %>%
 get_p_value(null_dist, obs_stat = observed_weight, direction = "two-sided")
 ```
 
+### Exercise 5
 
-Add exercise headings as needed.
+This boxplot shows that the babies from smokers vs. nonsmokers in the dataframe generally weighed similarly, but that there are more outliers in the nonsmoker group.
+
+```{r boxplot-visual}
+
+ncbirths %>%
+  filter(!is.na(habit) & !is.na(weight)) %>%
+  ggplot(aes(x = habit, y = weight))+
+  geom_boxplot() +
+  theme_bw()
+
+```
+
+### Exercise 6
+
+```{r cleaned-data}
+
+ncbirths_cleaned <- ncbirths %>%
+  filter(!is.na(habit) & !is.na(weight))
+
+```
+
+### Exercise 7
+
+```{r}
+
+```
+
