@@ -68,8 +68,8 @@ null_dist <- birth_bootstrap %>%
 #visualize
 
 ggplot()+
-  geom_histogram(data = null_dist, aes(x = stat), fill = "skyblue", color = "black", alpha = 0.5)+
-  geom_histogram(data = birth_bootstrap, aes(x = stat), fill = "navyblue", color = "black", alpha = 0.5)+
+  geom_histogram(data = null_dist, aes(x = stat), fill = "skyblue", color = "black", alpha = 0.25)+
+  geom_histogram(data = birth_bootstrap, aes(x = stat), fill = "navyblue", color = "black", alpha = 0.25)+
   theme_bw()
 
 #test
@@ -106,7 +106,59 @@ ncbirths_cleaned <- ncbirths %>%
 
 ### Exercise 7
 
-```{r}
+```{r mean-diff}
 
+ncbirths_cleaned %>%
+  group_by(habit) %>%
+  summarise(mean_weight = mean(weight))
 ```
+### Exercise 8
+
+H0: uSmoking = uNonSmoking
+H1: uSmoking =/= uNonSmoking
+
+### Exercise 9
+
+It seems that smokers had smaller babies than non-smokers (p = .002).
+
+```{r inital-bootstrap}
+
+set.seed(1000)
+
+smoker_bootstrap <- ncbirths_cleaned %>%
+  specify(weight ~ habit) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "diff in means", order = c("smoker", "nonsmoker"))
+```
+
+```{r null-and-plot}
+
+#set null distribution
+
+null_center_new <- 0 - mean(smoker_bootstrap$stat, na.rm = TRUE)
+
+null_smoke <- smoker_bootstrap %>%
+  mutate(stat = stat + null_center_new)
+
+ggplot()+
+  geom_histogram(data = null_smoke, aes(x = stat), fill = "skyblue", color = "black", alpha = 0.2)+
+  geom_histogram(data =smoker_bootstrap, aes(x = stat), fill = "navyblue", color = "black", alpha = 0.2)+
+  theme_bw() +
+  labs(x = "Mean Difference",
+       y = "Count")
+```
+
+```{r inferential-test}
+
+weight_diff <- ncbirths_cleaned %>%
+  specify(weight ~ habit) %>%
+  calculate(stat = "diff in means", order = c("smoker", "nonsmoker"))
+
+get_p_value(null_smoke, obs_stat = weight_diff, direction = "both")
+```
+
+### Exercise 10
+
+
+
 
