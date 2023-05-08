@@ -15,12 +15,29 @@ library(openintro)
 
 ### Exercise 1
 
-```{r}
+Each case is one baby in North Carolina. Thus, each variable describes something that applies to that baby: the age of their mother/father, their weight, etc. There are a total of 1,000 babies in this dataframe.
+
+
+```{r exercise-1}
+
+data(ncbirths)
+view(ncbirths)
 
 ```
 
 ### Exercise 2
 
-...
+The average white baby weighs 7.25 pounds.
+
+```{r exercise-2}
+
+ncbirths_white <- ncbirths %>%
+  filter(whitemom == "white")
+
+mean_weight <- mean(ncbirths_white$weight)
+
+mean_weight
+```
+
 
 Add exercise headings as needed.
