@@ -159,6 +159,58 @@ get_p_value(null_smoke, obs_stat = weight_diff, direction = "both")
 
 ### Exercise 10
 
+I am going to seperate mature from young mothers by doing a median split. 
 
+```{r median-split}
 
+ncbirths_cleaned <- ncbirths_cleaned %>%
+  mutate(mother_agegroup = case_when(mage > median(mage) ~ "Mature Mother",
+         mage <= median(mage) ~ "Younger Mother"))
+
+```
+
+### Exercise 11
+
+According to our results, there does not seem to be a difference in birth weight between older and younger mothers.
+
+```{r test}
+
+set.seed(1000)
+
+weight_age <- ncbirths_cleaned %>%
+  specify(response = lowbirthweight, explanatory = mother_agegroup, success = "not low") %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "diff in props", order = c("Younger Mother", "Mature Mother"))
+
+#set null
+
+null_center_three <- 0 - mean(weight_age$stat, na.rm = TRUE)
+
+weight_age_null <- weight_age %>%
+  mutate(stat = stat - null_center_three)
+
+ggplot()+
+  geom_histogram(data = weight_age_null, aes(x = stat), fill = "skyblue", color = "black", alpha = 0.5)+
+  geom_histogram(data = weight_age, aes(x = stat), fill = "navyblue", color = "black", alpha = 0.5)+
+  theme_classic()
+
+#test
+
+differences <- ncbirths_cleaned %>%
+  specify(response = lowbirthweight, explanatory = mother_agegroup, success = "not low") %>%
+  calculate(stat = "diff in props", order = c("Younger Mother", "Mature Mother"))
+            
+get_p_value(weight_age_null, obs_stat = differences, direction = "both")
+
+```
+
+### Exercise 13
+
+If we had data from all mothers, we would expect the mean weight of babies born to mature mothers to be anywhere from 3% lighter to 4% heavier than those born to younger mothers.
+
+```{r last-thing-in-r-class}
+
+get_ci(weight_age, level = 0.95)
+
+```
 
