@@ -39,5 +39,47 @@ mean_weight <- mean(ncbirths_white$weight)
 mean_weight
 ```
 
+### Exercise 3
+
+We need to simulate the population mean because we only have a sample, and not the population. 
+
+### Exercise 4
+
+These results reveal that white babies in NC now weigh less (M = 7.25) than they did in 1995 (M = 7.43), p = .001.
+
+```{r exercise-4}
+
+#initial bootstrap
+
+set.seed(1000)
+
+birth_bootstrap <- ncbirths_white %>%
+  specify(response = weight) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+
+#create null distribution
+
+null_center <- 7.43 - mean(birth_bootstrap$stat, na.rm = TRUE)
+
+null_dist <- birth_bootstrap %>%
+  mutate(stat = stat + null_center)
+
+#visualize
+
+ggplot()+
+  geom_histogram(data = null_dist, aes(x = stat), fill = "skyblue", color = "black", alpha = 0.5)+
+  geom_histogram(data = birth_bootstrap, aes(x = stat), fill = "navyblue", color = "black", alpha = 0.5)+
+  theme_bw()
+
+#test
+
+observed_weight <- ncbirths_white %>%
+  specify(response = weight) %>%
+  calculate(stat = "mean")
+
+get_p_value(null_dist, obs_stat = observed_weight, direction = "two-sided")
+```
+
 
 Add exercise headings as needed.
